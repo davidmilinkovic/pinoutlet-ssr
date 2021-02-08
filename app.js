@@ -2,7 +2,12 @@ var express = require('express');
 const fs = require('fs');
 const path = require('path');
 const fetch = require('node-fetch');
-const { setInterval } = require('timers');
+const {
+  setInterval
+} = require('timers');
+const {
+  decode
+} = require("url-encode-decode");
 
 var metas = {
   "Description": "Pekarska, poslastičarska, ugostiteljska, rashladna, neutralna oprema i rezervni delovi za Vaše preduzeće. Delilice, mikseri, pekarske peći, sokovnici, mikrotalasne i mnogi drugi proizvodi."
@@ -15,23 +20,23 @@ var ogMetas = {
   "image": "https://www.pekarskemasine.com/logo.ico"
 }
 
-formMetas = (values = {}) => {  
-  for(m in metas) {
-    if(values[m] == null) values[m] = metas[m];
+formMetas = (values = {}) => {
+  for (m in metas) {
+    if (values[m] == null) values[m] = metas[m];
   }
   var metasHtml = "";
-  for(m in values) {
+  for (m in values) {
     metasHtml += `<meta name="${m}" content="${values[m]}" />\n`;
   }
   return metasHtml;
 }
 
-formOgMetas = (values = {}) => {  
-  for(m in ogMetas) {
-    if(values[m] == null) values[m] = ogMetas[m];
+formOgMetas = (values = {}) => {
+  for (m in ogMetas) {
+    if (values[m] == null) values[m] = ogMetas[m];
   }
   var metasHtml = "";
-  for(m in values) {
+  for (m in values) {
     metasHtml += `<meta property="og:${m}" content="${values[m]}" />\n`;
   }
   return metasHtml;
@@ -57,20 +62,22 @@ app.get(/\.(js|css|map|ico|jpg|png|gif|svg)$/, express.static(path.resolve(__dir
 app.use('*', (req, res) => {
 
   var ruta = req.originalUrl.substr(1);
-  while(ruta.includes("%20")) ruta = ruta.replace("%20", " ");
-
+  ruta = decode(ruta);
   var metasStr = "";
 
-  if(artikli[ruta] != null) {
+  if (artikli[ruta] != null) {
+    console.log(ruta + " jeste artikal");
     var ogs = {};
-    
-    if(artikli[ruta].images.length > 0) ogs["image"] = "https://api.pinoutlet.geasoft.net/products/" + artikli[ruta].images[0];
-    ogs["description"] = artikli[ruta].description;    
-    ogs["title"] = artikli[ruta].displayTitle;    
+
+    if (artikli[ruta].images.length > 0) ogs["image"] = "https://api.pinoutlet.geasoft.net/products/" + artikli[ruta].images[0];
+    ogs["description"] = artikli[ruta].description;
+    ogs["title"] = artikli[ruta].displayTitle;
 
     metasStr = formMetas() + formOgMetas(ogs);
+  } else {
+    console.log(ruta + " nije artikal");
+    metasStr = formMetas() + formOgMetas();
   }
-  else metasStr = formMetas() + formOgMetas();
 
   let indexHTML = fs.readFileSync(path.resolve(__dirname, './build/index.html'), {
     encoding: 'utf8',
@@ -91,7 +98,7 @@ function preuzmiArtikle() {
   fetch("http://localhost:4000/api/v1/products")
     .then(res => res.json())
     .then(res => {
-      for(var art of res) {
+      for (var art of res) {
         artikli[art.title] = art;
       }
     })
