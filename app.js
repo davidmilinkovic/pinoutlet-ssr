@@ -10,7 +10,7 @@ const {
 } = require("url-encode-decode");
 
 var metas = {
-  "Description": "Pekarska, poslastičarska, ugostiteljska, rashladna, neutralna oprema i rezervni delovi za Vaše preduzeće. Delilice, mikseri, pekarske peći, sokovnici, mikrotalasne i mnogi drugi proizvodi."
+  "description": "Pekarska, poslastičarska, ugostiteljska, rashladna, neutralna oprema i rezervni delovi za Vaše preduzeće. Delilice, mikseri, pekarske peći, sokovnici, mikrotalasne i mnogi drugi proizvodi."
 }
 var ogMetas = {
   "title": "PEKARSKA I UGOSTITELJSKA OPREMA PIN OUTLET &#8211; UVOZ – PRODAJA – ISPORUKA – SERVIS I MONTAŽA OPREME Tel: +381 65 550 60 11",
@@ -73,7 +73,18 @@ app.use('*', (req, res) => {
     ogs["description"] = artikli[ruta].description;
     ogs["title"] = artikli[ruta].displayTitle;
 
-    metasStr = formMetas() + formOgMetas(ogs);
+    var metas = {};
+    metas["description"] = artikli[ruta].description;
+    var tagovi = [];
+    for(var tag of artikli[ruta].tags) {
+      tagovi.push(tag.title);
+      console.log(tag.title);
+    }
+      
+    var strTagovi = tagovi.join(",");
+    metas["keywords"] = strTagovi;
+
+    metasStr = formMetas(metas) + formOgMetas(ogs);
   } else {
     console.log(ruta + " nije artikal");
     metasStr = formMetas() + formOgMetas();
