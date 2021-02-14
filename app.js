@@ -43,6 +43,7 @@ formOgMetas = (values = {}) => {
 }
 
 var artikli = {};
+var blogovi = {};
 
 var app = express();
 
@@ -52,12 +53,14 @@ app.use(express.urlencoded({
 }));
 
 preuzmiArtikle();
-setInterval(preuzmiArtikle, 60000);
+setInterval(preuzmiArtikle, 1000 * 60 * 10); // jednom u 10min
+preuzmiBlogove();
+setInterval(preuzmiBlogove, 1000 * 60 * 60 * 24); // jednom dnevno
 
 var port = '4444';
 app.set('port', port);
 
-app.get(/\.(js|css|map|ico|jpg|png|gif|svg)$/, express.static(path.resolve(__dirname, './build')));
+app.get(/\.(js|css|map|ico|jpg|png|gif|svg|txt|xml)$/, express.static(path.resolve(__dirname, './build')));
 
 app.use('*', (req, res) => {
 
@@ -66,7 +69,7 @@ app.use('*', (req, res) => {
   var metasStr = "";
 
   if (artikli[ruta] != null) {
-    console.log(ruta + " jeste artikal");
+    console.log("Artikal: " + ruta);
     var ogs = {};
 
     if (artikli[ruta].images.length > 0) ogs["image"] = "https://api.pinoutlet.geasoft.net/products/" + artikli[ruta].images[0];
@@ -78,15 +81,29 @@ app.use('*', (req, res) => {
     var tagovi = [];
     for(var tag of artikli[ruta].tags) {
       tagovi.push(tag.title);
-      console.log(tag.title);
     }
       
     var strTagovi = tagovi.join(",");
     metas["keywords"] = strTagovi;
 
     metasStr = formMetas(metas) + formOgMetas(ogs);
-  } else {
-    console.log(ruta + " nije artikal");
+  } else if(ruta.includes("blog/")) {
+    var nazivBloga = ruta.substr(ruta.indexOf("blog/") + 5);
+    console.log("Blog: " + nazivBloga);
+    var blog = blogovi[nazivBloga];
+
+    var ogs = {};
+    if (blog.cover != null) ogs["image"] = "https://api.pinoutlet.geasoft.net/blog/" + blog.cover;
+    ogs["description"] = blog.preview;
+    ogs["title"] = nazivBloga;
+
+    var metas = {};
+    metas["description"] =  blog.preview;
+    metas["keywords"] = blog.tags;
+
+    metasStr = formMetas(metas) + formOgMetas(ogs);
+  }
+  else {
     metasStr = formMetas() + formOgMetas();
   }
 
@@ -111,6 +128,16 @@ function preuzmiArtikle() {
     .then(res => {
       for (var art of res) {
         artikli[art.title] = art;
+      }
+    })
+}
+
+function preuzmiBlogove() {
+  fetch("http://localhost:4000/api/v1/blog")
+    .then(res => res.json())
+    .then(res => {
+      for (var blog of res) {
+        blogovi[blog.title] = blog;
       }
     })
 }
