@@ -10,7 +10,8 @@ const {
 } = require("url-encode-decode");
 
 var metas = {
-  "description": "Pekarska, poslastičarska, ugostiteljska, rashladna, neutralna oprema i rezervni delovi za Vaše preduzeće. Delilice, mikseri, pekarske peći, sokovnici, mikrotalasne i mnogi drugi proizvodi."
+  "description": "Pekarska, poslastičarska, ugostiteljska, rashladna, neutralna oprema i rezervni delovi za Vaše preduzeće. Delilice, mikseri, pekarske peći, sokovnici, mikrotalasne i mnogi drugi proizvodi.",
+  "keywords": "pekarska,oprema,ugostiteljska,rashladna,neutralna,delovi,rezervni,pekare,picerije,delilice,mikseri,pizza,peci"
 }
 var ogMetas = {
   "title": "PEKARSKA I UGOSTITELJSKA OPREMA PIN OUTLET &#8211; UVOZ – PRODAJA – ISPORUKA – SERVIS I MONTAŽA OPREME Tel: +381 65 550 60 11",
