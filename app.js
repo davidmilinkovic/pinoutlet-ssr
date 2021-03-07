@@ -89,7 +89,7 @@ app.use('*', (req, res) => {
 
     metasStr = formMetas(metas) + formOgMetas(ogs);
   } else if(ruta.includes("blog/")) {
-    var nazivBloga = ruta.substr(ruta.indexOf("blog/") + 5);
+    var nazivBloga = ruta.substr(ruta.indexOf("blog/") + 5).replace("post/", "");
     console.log("Blog: " + nazivBloga);
     var blog = blogovi[nazivBloga];
 
