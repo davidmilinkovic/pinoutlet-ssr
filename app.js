@@ -133,6 +133,7 @@ function preuzmiArtikle() {
     .then(res => {
       for (var art of res) {
         artikli[art.title] = art;
+        artikli[art.title.trim()] = art;
       }
     })
 }
