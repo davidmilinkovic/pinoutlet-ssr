@@ -66,7 +66,11 @@ app.get(/\.(js|css|map|ico|jpg|png|gif|svg|txt|xml)$/, express.static(path.resol
 app.use('*', (req, res) => {
 
   var ruta = req.originalUrl.substr(1);
+  var question = ruta.indexOf("?");
+  if(question && question != -1)
+    ruta = ruta.substr(0, question);
   ruta = decode(ruta);
+  console.log("Ruta je: " + ruta);
   var metasStr = "";
 
   if (artikli[ruta] != null) {
